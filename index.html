@@ -171,7 +171,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--navy);color:va
 .container{padding:22px 32px;max-width:1400px;margin:0 auto;}
 
 /* KPI */
-.kpi-row{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin-bottom:20px;}
+.kpi-row{display:grid;grid-template-columns:repeat(7,1fr);gap:12px;margin-bottom:20px;}
 .kpi{background:var(--navy2);border:1px solid var(--navy3);border-radius:12px;padding:16px 18px;display:flex;flex-direction:column;gap:5px;position:relative;overflow:hidden;}
 .kpi::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;}
 .kpi.k-red::before{background:var(--red);}
@@ -256,21 +256,54 @@ tbody tr.total-row td{font-weight:700;}
 .mc-dia{font-size:.67rem;color:var(--yellow);margin-top:4px;font-weight:700;}
 .mc-pct{font-size:.67rem;margin-top:3px;font-weight:700;}
 
+.footer{background:var(--navy2);border-top:1px solid var(--navy3);text-align:center;padding:14px;color:var(--gray);font-size:.7rem;}
+.footer strong{color:var(--red-l);}
 
-/* MOBILE */
+/* ─── MOBILE RESPONSIVO ─── */
 @media (max-width:960px){
   .kpi-row{grid-template-columns:repeat(3,1fr);}
   .charts-2,.charts-3{grid-template-columns:1fr;}
   .jul-grid{grid-template-columns:repeat(2,1fr);}
+  .mes-grid{grid-template-columns:repeat(3,1fr);}
   .m27g{grid-template-columns:repeat(2,1fr);}
   .container{padding:14px 16px;}
+  .header{flex-direction:column;align-items:flex-start;padding:14px 16px;gap:8px;}
+  .header-right{align-items:flex-start;}
+  .hbadges{flex-wrap:wrap;gap:5px;}
+  .strip{flex-direction:column;gap:3px;padding:8px 16px;font-size:.65rem;text-align:center;}
+  .alert{flex-direction:column;gap:5px;padding:10px 16px;font-size:.75rem;text-align:center;}
+  .alert .pill{align-self:center;}
+  .table-card{overflow-x:auto;}
+  table{min-width:680px;}
+  .resp-grid{grid-template-columns:1fr !important;}
+  .resp-grid-2{grid-template-columns:1fr 1fr !important;}
+  #cenariosGrid{grid-template-columns:repeat(2,1fr) !important;}
+  #extraGrid{grid-template-columns:repeat(2,1fr) !important;}
+  .chart-card{padding:14px 12px;}
+  .card{padding:14px 16px;}
+  .k-val{font-size:1.1rem;}
 }
 @media (max-width:600px){
   .kpi-row{grid-template-columns:repeat(2,1fr);}
-  .header{flex-direction:column;padding:12px 16px;}
-  .mes-grid{grid-template-columns:repeat(3,1fr);}
-}.footer{background:var(--navy2);border-top:1px solid var(--navy3);text-align:center;padding:14px;color:var(--gray);font-size:.7rem;}
-.footer strong{color:var(--red-l);}
+  .mes-grid{grid-template-columns:repeat(2,1fr);}
+  .m27g{grid-template-columns:1fr 1fr;}
+  .jul-grid{grid-template-columns:repeat(2,1fr);}
+  .logo-gmb{font-size:1.5rem;}
+  .logo-barato{font-size:1.1rem;}
+  .logo-mais{font-size:.95rem;}
+  .hb{font-size:.62rem;padding:4px 9px;}
+  .header-title{font-size:.62rem;}
+  .k-val{font-size:1rem;}
+  .k-label{font-size:.6rem;}
+  .k-sub{font-size:.62rem;}
+  #cenariosGrid{grid-template-columns:1fr 1fr !important;}
+  #extraGrid{grid-template-columns:1fr 1fr !important;}
+  .chart-card h3,.card-title{font-size:.65rem;}
+}
+@media (max-width:400px){
+  .kpi-row{grid-template-columns:1fr 1fr;}
+  .logo-sep{display:none;}
+}
 </style>
 </head>
 <body>
@@ -301,9 +334,9 @@ tbody tr.total-row td{font-weight:700;}
 
 <!-- ALERT -->
 <div class="alert">
-  <span>✅ 15 DIAS CONFIRMADOS — R$ 5.555.490/mês</span>
-  <span class="pill">Ritmo: R$ 179.209/dia | Acumulado: R$ 2.688.140</span>
-  <span>+R$ 55.490 acima da meta | 15 dias confirmados</span>
+  <span>🟢 JULHO ACIMA DA META — 15 DIAS CONFIRMADOS!</span>
+  <span class="pill">Ritmo atual: R$ 5.555.490/mês — META: R$ 5.500.000</span>
+  <span>+1,0% ACIMA da meta mensal — dias 01 a 15/Jul/2026</span>
 </div>
 
 <!-- STRIP -->
@@ -325,7 +358,12 @@ tbody tr.total-row td{font-weight:700;}
   <div class="kpi k-green">
     <div class="k-label">Julho (15 dias)</div>
     <div class="k-val">R$ 5,56M</div>
-    <div class="k-sub">+R$ 55.490 acima da meta ✅</div>
+    <div class="k-sub">Projeção do mês ✅ acima meta</div>
+  </div>
+  <div class="kpi k-green" style="border:1px solid rgba(34,197,94,.4);">
+    <div class="k-label">Mínimo diário p/ meta Jul</div>
+    <div class="k-val">R$ 175.741</div>
+    <div class="k-sub" style="color:#4ADE80;">Ritmo atual: R$ 179.209 ✅ +R$ 3.468/dia</div>
   </div>
   <div class="kpi k-orange">
     <div class="k-label">Projeção 2026</div>
@@ -394,7 +432,7 @@ tbody tr.total-row td{font-weight:700;}
     <div class="jul-card">
       <div class="jl">Ritmo Diário</div>
       <div class="jv" style="color:#60A5FA;">R$ 179.209/dia</div>
-      <div class="js">meta diária: R$ 177.419/dia</div>
+      <div class="js">vs Jun: R$ 167.812/dia (+6,8%)</div>
     </div>
     <div class="jul-card">
       <div class="jl">Projeção Julho (×31 dias)</div>
@@ -404,7 +442,34 @@ tbody tr.total-row td{font-weight:700;}
     <div class="jul-card">
       <div class="jl">% da Meta (5,5M)</div>
       <div class="jv" style="color:#4ADE80;">101,0%</div>
-      <div class="js">Meta atingida! ✅</div>
+      <div class="js">15 dias confirmados acima!</div>
+    </div>
+  </div>
+  <!-- QUANTO PRECISAMOS POR DIA -->
+  <div class="resp-grid" style="background:linear-gradient(135deg,rgba(34,197,94,.1),rgba(59,130,246,.1));border:1.5px solid rgba(34,197,94,.35);border-radius:10px;padding:14px 18px;margin-bottom:14px;display:grid;grid-template-columns:repeat(5,1fr);gap:12px;align-items:center;">
+    <div style="text-align:center;">
+      <div style="font-size:.63rem;color:var(--gray);text-transform:uppercase;letter-spacing:.07em;margin-bottom:4px;">Realizado (12 dias)</div>
+      <div style="font-size:1rem;font-weight:800;color:#60A5FA;">R$ 2.688.140</div>
+    </div>
+    <div style="text-align:center;">
+      <div style="font-size:.63rem;color:var(--gray);text-transform:uppercase;letter-spacing:.07em;margin-bottom:4px;">Falta para R$ 5,5M</div>
+      <div style="font-size:1rem;font-weight:800;color:#FB923C;">R$ 2.811.860</div>
+      <div style="font-size:.65rem;color:var(--gray);">em 16 dias restantes</div>
+    </div>
+    <div style="text-align:center;border-left:1px solid var(--navy4);border-right:1px solid var(--navy4);padding:0 8px;">
+      <div style="font-size:.63rem;color:var(--gray);text-transform:uppercase;letter-spacing:.07em;margin-bottom:4px;">Mínimo necessário/dia</div>
+      <div style="font-size:1.2rem;font-weight:800;color:var(--yellow);">R$ 175.741</div>
+      <div style="font-size:.65rem;color:var(--gray);">para fechar R$ 5,5M</div>
+    </div>
+    <div style="text-align:center;">
+      <div style="font-size:.63rem;color:var(--gray);text-transform:uppercase;letter-spacing:.07em;margin-bottom:4px;">Ritmo atual/dia</div>
+      <div style="font-size:1rem;font-weight:800;color:#4ADE80;">R$ 179.209</div>
+      <div style="font-size:.65rem;color:#4ADE80;">+R$ 3.468 de folga ✅</div>
+    </div>
+    <div style="text-align:center;background:rgba(34,197,94,.15);border:1px solid rgba(34,197,94,.4);border-radius:8px;padding:10px;">
+      <div style="font-size:.63rem;color:var(--gray);text-transform:uppercase;letter-spacing:.07em;margin-bottom:4px;">Situação</div>
+      <div style="font-size:1.1rem;font-weight:800;color:#4ADE80;">NO CAMINHO</div>
+      <div style="font-size:.7rem;color:#4ADE80;margin-top:2px;">✅ Meta garantida</div>
     </div>
   </div>
   <div style="position:relative;height:200px;"><div style="display:block;width:100%;height:100%;" id="chartJul7"></div></div>
@@ -428,12 +493,36 @@ tbody tr.total-row td{font-weight:700;}
   </table>
 </div>
 
+<!-- POTENCIAL DE CRESCIMENTO -->
+<div style="background:linear-gradient(135deg,#0A0E25,#0D1235);border:2px solid rgba(255,214,0,.4);border-radius:12px;padding:22px;margin-bottom:18px;">
+  <div style="font-size:.95rem;font-weight:800;color:var(--yellow);margin-bottom:6px;display:flex;align-items:center;gap:10px;">
+    <span style="width:4px;height:20px;background:var(--yellow);border-radius:2px;display:inline-block;"></span>
+    🚀 POTENCIAL DE CRESCIMENTO — ONDE PODEMOS CHEGAR EM 2026
+  </div>
+  <div style="font-size:.76rem;color:var(--gray);margin-bottom:18px;padding-left:14px;">Base: H1 realizado R$ 26,9M fixo. Cada cenário mostra o total anual caso o H2 (Jul–Dez) cresça X% acima da projeção atual por sazonalidade</div>
+  <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:18px;" id="cenariosGrid"></div>
+  <div class="resp-grid" style="display:grid;grid-template-columns:3fr 2fr;gap:16px;">
+    <div>
+      <div style="font-size:.7rem;text-transform:uppercase;letter-spacing:.08em;color:var(--gray);margin-bottom:10px;display:flex;align-items:center;gap:6px;"><span style="width:3px;height:12px;background:var(--yellow);border-radius:2px;display:inline-block;"></span>Total anual 2026 por cenário de crescimento</div>
+      <div style="position:relative;height:230px;"><div style="display:block;width:100%;height:100%;" id="chartCenariosBar"></div></div>
+    </div>
+    <div>
+      <div style="font-size:.7rem;text-transform:uppercase;letter-spacing:.08em;color:var(--gray);margin-bottom:10px;display:flex;align-items:center;gap:6px;"><span style="width:3px;height:12px;background:var(--yellow);border-radius:2px;display:inline-block;"></span>Curva mensal H2 (Jul–Dez) por cenário</div>
+      <div style="position:relative;height:230px;"><div style="display:block;width:100%;height:100%;" id="chartCenariosLine"></div></div>
+    </div>
+  </div>
+  <div style="margin-top:16px;background:rgba(0,0,0,.3);border:1px solid var(--navy4);border-radius:9px;padding:14px;">
+    <div style="font-size:.72rem;font-weight:700;color:var(--gray-l);margin-bottom:10px;">O que é necessário de cada loja para atingir cada cenário (extra por loja × mês no H2):</div>
+    <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px;" id="extraGrid"></div>
+  </div>
+</div>
+
 <!-- PLANO PARA 66M -->
 <div class="plano">
   <div class="plano-title">⚡ PLANO PARA ATINGIR R$ 66M EM 2026</div>
-  <div class="plano-sub">No ritmo atual projetamos R$ 60,87M. Para fechar os R$ 66M, o H2 precisa rodar a R$ 6.513k/mês em média — ou seja, +R$ 855k/mês acima da projeção atual (+17,2% vs Julho)</div>
+  <div class="plano-sub">No ritmo atual projetamos R$ 61,96M. Para fechar os R$ 66M, o H2 precisa rodar a R$ 6.513k/mês em média — ou seja, +R$ 674k/mês acima da projeção atual (+11,8% vs Julho)</div>
 
-  <div style="display:grid;grid-template-columns:1.5fr 1fr;gap:16px;margin-bottom:18px;">
+  <div class="resp-grid" style="display:grid;grid-template-columns:1.5fr 1fr;gap:16px;margin-bottom:18px;">
     <div>
       <div style="font-size:.71rem;text-transform:uppercase;letter-spacing:.08em;color:var(--gray);margin-bottom:12px;display:flex;align-items:center;gap:6px;"><span style="width:3px;height:12px;background:var(--red);border-radius:2px;display:inline-block;"></span>H2 necessário vs projetado</div>
       <div style="position:relative;height:220px;"><div style="display:block;width:100%;height:100%;" id="chartPlano"></div></div>
@@ -461,12 +550,12 @@ tbody tr.total-row td{font-weight:700;}
     <div class="m27c">
       <div class="ml">Meta Mensal para 66M</div>
       <div class="mv" style="color:#4ADE80;">R$ 6.512.657</div>
-      <div class="ms" style="color:var(--gray);">+R$ 957k vs projeção Jul</div>
+      <div class="ms" style="color:var(--gray);">+R$ 957k vs Jul atual</div>
     </div>
     <div class="m27c">
       <div class="ml">Crescimento Necessário vs Jul</div>
       <div class="mv" style="color:var(--yellow);">+17,2%</div>
-      <div class="ms" style="color:var(--gray);">acima da projeção de Julho</div>
+      <div class="ms" style="color:var(--gray);">acima do ritmo de Julho</div>
     </div>
   </div>
 </div>
@@ -500,19 +589,118 @@ tbody tr.total-row td{font-weight:700;}
     <div style="font-size:.71rem;color:var(--gray);margin-bottom:7px;text-transform:uppercase;letter-spacing:.08em;">Trajetória: 2025 real → 2026 proj → 2027 meta</div>
     <div class="pbar-wrap">
       <div class="pbar-fill" style="width:94%;background:linear-gradient(90deg,var(--red),var(--red-l));color:#fff;">
-        2026: R$ 60,87M (92,2% de 66M)
+        2026: R$ 61,96M (93,9% de 66M)
       </div>
     </div>
     <div class="pbar-labels">
       <span>2025 real: R$ 49,2M</span>
       <span style="color:var(--yellow);font-weight:700;">🎯 2026 meta: R$ 66M</span>
-      <span style="color:#FF8A80;">Gap: -R$ 5,13M</span>
+      <span style="color:#FF8A80;">Gap: -R$ 4,04M</span>
     </div>
   </div>
 </div>
 
 </div>
-<div class="footer">Dashboard atualizado em 16/07/2026 &nbsp;|&nbsp; <strong>GMB — Drogarias Mais Barato®</strong> &nbsp;|&nbsp; Dados: Jan–Jun 2026 real + Jul 1–15 2026 + 2025 histórico</div>
+<!-- BASE DE CÁLCULO -->
+<div style="background:var(--navy2);border-top:2px solid var(--navy3);padding:28px 32px;max-width:1400px;margin:0 auto;">
+  <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px;">
+    <span style="width:4px;height:22px;background:var(--gray);border-radius:2px;display:inline-block;"></span>
+    <span style="font-size:.88rem;font-weight:800;color:var(--gray-l);text-transform:uppercase;letter-spacing:.1em;">Base de Cálculo e Fontes de Dados</span>
+    <span style="background:rgba(30,45,125,.6);border:1px solid var(--navy4);border-radius:20px;padding:3px 12px;font-size:.68rem;color:var(--gray);">Transparência metodológica</span>
+  </div>
+
+  <div class="resp-grid" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:20px;">
+
+    <!-- COLUNA 1: Fontes -->
+    <div style="background:rgba(0,0,0,.25);border:1px solid var(--navy3);border-radius:10px;padding:16px;">
+      <div style="font-size:.7rem;font-weight:800;color:var(--yellow);text-transform:uppercase;letter-spacing:.08em;margin-bottom:12px;border-bottom:1px solid var(--navy3);padding-bottom:8px;">📄 Fontes de Dados Utilizadas</div>
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        <div style="background:rgba(59,130,246,.1);border:1px solid rgba(59,130,246,.25);border-radius:7px;padding:10px;">
+          <div style="font-size:.72rem;font-weight:700;color:#60A5FA;margin-bottom:3px;">Faturamento 2025.pdf</div>
+          <div style="font-size:.68rem;color:var(--gray);">Relatório anual completo — Jan a Dez/2025</div>
+          <div style="font-size:.68rem;color:var(--gray);">11 lojas ativas · Total: <strong style="color:#94A3B8;">R$ 49.202.892</strong></div>
+        </div>
+        <div style="background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.2);border-radius:7px;padding:10px;">
+          <div style="font-size:.72rem;font-weight:700;color:#4ADE80;margin-bottom:3px;">Faturamento Lojas.pdf</div>
+          <div style="font-size:.68rem;color:var(--gray);">H1 2026 — Janeiro a Junho/2026</div>
+          <div style="font-size:.68rem;color:var(--gray);">12 lojas (L12 entrou Jun) · Total H1: <strong style="color:#94A3B8;">R$ 26.924.059</strong></div>
+        </div>
+        <div style="background:rgba(249,115,22,.08);border:1px solid rgba(249,115,22,.25);border-radius:7px;padding:10px;">
+          <div style="font-size:.72rem;font-weight:700;color:#FB923C;margin-bottom:3px;">Faturamento Jul.pdf (×2 arquivos)</div>
+          <div style="font-size:.68rem;color:var(--gray);">Julho/2026 — Dias 1–7 + Dias 8–12 (tempo real)</div>
+          <div style="font-size:.68rem;color:var(--gray);">12 lojas · Acumulado 15 dias: <strong style="color:#94A3B8;">R$ 2.688.140</strong></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- COLUNA 2: Metodologia -->
+    <div style="background:rgba(0,0,0,.25);border:1px solid var(--navy3);border-radius:10px;padding:16px;">
+      <div style="font-size:.7rem;font-weight:800;color:var(--yellow);text-transform:uppercase;letter-spacing:.08em;margin-bottom:12px;border-bottom:1px solid var(--navy3);padding-bottom:8px;">📐 Metodologia de Projeção</div>
+      <div style="display:flex;flex-direction:column;gap:7px;font-size:.69rem;color:var(--gray-l);">
+        <div style="display:flex;gap:8px;align-items:flex-start;">
+          <span style="color:var(--yellow);font-weight:800;flex-shrink:0;">1.</span>
+          <span><strong style="color:var(--white);">Ritmo de Julho:</strong> R$ 2.171.417 ÷ 12 dias = R$ 180.951/dia × 31 dias = <strong style="color:#4ADE80;">R$ 5.609.494</strong> projeção do mês</span>
+        </div>
+        <div style="display:flex;gap:8px;align-items:flex-start;">
+          <span style="color:var(--yellow);font-weight:800;flex-shrink:0;">2.</span>
+          <span><strong style="color:var(--white);">Sazonalidade 2025:</strong> Cada mês do H2 recebeu um índice baseado na variação histórica de 2025 em relação a Julho/2025</span>
+        </div>
+        <div style="background:rgba(0,0,0,.3);border-radius:7px;padding:9px;margin:2px 0;">
+          <div style="font-size:.66rem;color:var(--gray);margin-bottom:5px;font-weight:700;">Índices sazonais aplicados (vs Julho 2025):</div>
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:4px;">
+            <div style="text-align:center;background:rgba(30,45,125,.4);border-radius:5px;padding:4px;"><div style="font-size:.63rem;color:var(--gray);">Ago</div><div style="font-size:.72rem;font-weight:700;color:#94A3B8;">× 0,9953</div></div>
+            <div style="text-align:center;background:rgba(30,45,125,.4);border-radius:5px;padding:4px;"><div style="font-size:.63rem;color:var(--gray);">Set</div><div style="font-size:.72rem;font-weight:700;color:#94A3B8;">× 0,9724</div></div>
+            <div style="text-align:center;background:rgba(30,45,125,.4);border-radius:5px;padding:4px;"><div style="font-size:.63rem;color:var(--gray);">Out</div><div style="font-size:.72rem;font-weight:700;color:#4ADE80;">× 1,0385</div></div>
+            <div style="text-align:center;background:rgba(30,45,125,.4);border-radius:5px;padding:4px;"><div style="font-size:.63rem;color:var(--gray);">Nov</div><div style="font-size:.72rem;font-weight:700;color:#4ADE80;">× 1,0058</div></div>
+            <div style="text-align:center;background:rgba(30,45,125,.4);border-radius:5px;padding:4px;"><div style="font-size:.63rem;color:var(--gray);">Dez</div><div style="font-size:.72rem;font-weight:700;color:#4ADE80;">× 1,0978</div></div>
+            <div style="text-align:center;background:rgba(255,214,0,.08);border-radius:5px;padding:4px;border:1px solid rgba(255,214,0,.2);"><div style="font-size:.63rem;color:var(--gray);">Jul</div><div style="font-size:.72rem;font-weight:700;color:var(--yellow);">base 1,0</div></div>
+          </div>
+        </div>
+        <div style="display:flex;gap:8px;align-items:flex-start;">
+          <span style="color:var(--yellow);font-weight:800;flex-shrink:0;">3.</span>
+          <span><strong style="color:var(--white);">Distribuição por loja:</strong> Proporção do faturamento de cada loja em Jul/12 dias aplicada ao total projetado de H2</span>
+        </div>
+        <div style="display:flex;gap:8px;align-items:flex-start;">
+          <span style="color:var(--yellow);font-weight:800;flex-shrink:0;">4.</span>
+          <span><strong style="color:var(--white);">L12 — Loja Nova:</strong> Entrou em Jun/2026. Meta pro-rata calculada sobre 7 meses (Jun–Dez) em vez de 12</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- COLUNA 3: Parâmetros e Dados Mensais -->
+    <div style="background:rgba(0,0,0,.25);border:1px solid var(--navy3);border-radius:10px;padding:16px;">
+      <div style="font-size:.7rem;font-weight:800;color:var(--yellow);text-transform:uppercase;letter-spacing:.08em;margin-bottom:12px;border-bottom:1px solid var(--navy3);padding-bottom:8px;">📊 Parâmetros e Dados Mensais</div>
+      <div style="display:flex;flex-direction:column;gap:6px;">
+        <div style="background:rgba(30,45,125,.4);border-radius:7px;padding:9px;margin-bottom:4px;">
+          <div style="font-size:.66rem;color:var(--gray);margin-bottom:6px;font-weight:700;">Parâmetros utilizados:</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;font-size:.68rem;">
+            <div style="color:var(--gray);">Meta mensal</div><div style="color:var(--yellow);font-weight:700;">R$ 5.500.000</div>
+            <div style="color:var(--gray);">Meta anual</div><div style="color:var(--yellow);font-weight:700;">R$ 66.000.000</div>
+            <div style="color:var(--gray);">Lojas ativas</div><div style="color:var(--white);font-weight:700;">12 (L12 desde Jun)</div>
+            <div style="color:var(--gray);">Meta/loja/ano</div><div style="color:var(--white);font-weight:700;">R$ 5.500.000</div>
+            <div style="color:var(--gray);">Referência YoY</div><div style="color:var(--white);font-weight:700;">2025 vs 2026</div>
+            <div style="color:var(--gray);">Crescimento YoY</div><div style="color:#4ADE80;font-weight:700;">+18,9% médio</div>
+          </div>
+        </div>
+        <div style="font-size:.66rem;color:var(--gray);margin-bottom:4px;font-weight:700;">Faturamento mensal 2026 (realizado):</div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:4px;">
+          <div style="background:rgba(0,0,0,.3);border-radius:5px;padding:5px;text-align:center;"><div style="font-size:.6rem;color:var(--gray);">Jan/26</div><div style="font-size:.7rem;font-weight:700;color:#94A3B8;">R$ 4,08M</div></div>
+          <div style="background:rgba(0,0,0,.3);border-radius:5px;padding:5px;text-align:center;"><div style="font-size:.6rem;color:var(--gray);">Fev/26</div><div style="font-size:.7rem;font-weight:700;color:#94A3B8;">R$ 3,96M</div></div>
+          <div style="background:rgba(0,0,0,.3);border-radius:5px;padding:5px;text-align:center;"><div style="font-size:.6rem;color:var(--gray);">Mar/26</div><div style="font-size:.7rem;font-weight:700;color:#94A3B8;">R$ 4,54M</div></div>
+          <div style="background:rgba(0,0,0,.3);border-radius:5px;padding:5px;text-align:center;"><div style="font-size:.6rem;color:var(--gray);">Abr/26</div><div style="font-size:.7rem;font-weight:700;color:#94A3B8;">R$ 4,50M</div></div>
+          <div style="background:rgba(0,0,0,.3);border-radius:5px;padding:5px;text-align:center;"><div style="font-size:.6rem;color:var(--gray);">Mai/26</div><div style="font-size:.7rem;font-weight:700;color:#94A3B8;">R$ 4,81M</div></div>
+          <div style="background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.25);border-radius:5px;padding:5px;text-align:center;"><div style="font-size:.6rem;color:var(--gray);">Jun/26</div><div style="font-size:.7rem;font-weight:700;color:#4ADE80;">R$ 5,03M</div></div>
+        </div>
+        <div style="font-size:.63rem;color:var(--gray);margin-top:5px;padding:7px;background:rgba(255,214,0,.05);border:1px solid rgba(255,214,0,.15);border-radius:6px;">
+          ⚠️ <strong style="color:var(--yellow-l);">Atenção:</strong> Projeções H2 são estimativas baseadas em sazonalidade histórica. Resultados reais podem variar conforme campanhas, sazonalidade local e estratégias de cada loja.
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="footer">Dashboard atualizado em 16/07/2026 &nbsp;|&nbsp; <strong>GMB — Drogarias Mais Barato®</strong> &nbsp;|&nbsp; Dados: Jan–Jun 2026 real + Jul 1–15 2026 (15 dias) + histórico 2025</div>
 
 <script>
 // ─── DADOS ───
@@ -525,7 +713,7 @@ const d2025 = [3474384,3294176,3601245,3860541,4412535,4238306,4308056,4288004,4
 // 2026 H1 monthly totals (11 stores Jan-May + 12 stores Jun)
 const d2026real = [4075790,3963083,4540151,4498940,4811731,5034365];
 // 2026 H2 projected (Jul-Dec, based on Jul 7-day actual + 2025 seasonality)
-const d2026proj = [5555490,5529601,5402227,5769740,5587823,6099605];
+const d2026proj = [5555490,5529601,5402227,5769740,5587823,6099605]; // base: ritmo 15 dias Jul
 const d2026all = [...d2026real, ...d2026proj];
 
 // Cumulative 2026
@@ -547,22 +735,25 @@ const stores = [
   {cod:'04',nome:'Top 10',           h1:2893730,jul7:274671,anual2025:5578725},
   {cod:'05',nome:'Vicente Carvalho', h1:2763321,jul7:264234,anual2025:5303371},
   {cod:'06',nome:'Top 20',           h1:2554113,jul7:259991,anual2025:4675471},
-  {cod:'07',nome:'Atrativa Olinda',  h1:1694733,jul7:169053, anual2025:3407492},
-  {cod:'08',nome:'Farmagreg',        h1:2082848,jul7:195130, anual2025:3972260},
-  {cod:'09',nome:'Ponto Certo',      h1:2154104,jul7:191488, anual2025:3962311},
-  {cod:'10',nome:'FJW3',             h1:2097457,jul7:175873, anual2025:3732342},
-  {cod:'11',nome:'Rainha MH',        h1:1612755,jul7:131388, anual2025:2389073},
+  {cod:'07',nome:'Atrativa Olinda',  h1:1694733,jul7:169053,anual2025:3407492},
+  {cod:'08',nome:'Farmagreg',        h1:2082848,jul7:195130,anual2025:3972260},
+  {cod:'09',nome:'Ponto Certo',      h1:2154104,jul7:191488,anual2025:3962311},
+  {cod:'10',nome:'FJW3',             h1:2097457,jul7:175873,anual2025:3732342},
+  {cod:'11',nome:'Rainha MH',        h1:1612755,jul7:131388,anual2025:2389073},
   {cod:'12',nome:'Nobre Releango',   h1:387923, jul7:211827,anual2025:null, nova:true, mesesAtivos:7},
-];
+]; // jul7 = acumulado dias 01–15/Jul/2026
 
 const totalJul7 = stores.reduce((a,s)=>a+s.jul7,0); // 1295275.50
 const H2_TOTAL = d2026proj.reduce((a,b)=>a+b,0); // 35033470
 
 stores.forEach(s=>{
   s.julProj = Math.round(s.jul7 * 31 / 15);
-  s.h2proj  = Math.round((s.julProj / (totalJul7*31/15)) * H2_TOTAL);
+  s.h2proj  = Math.round((s.julProj / (totalJul7*31/7)) * H2_TOTAL);
   s.anualProj = s.h1 + s.h2proj;
-  s.gapAnual  = s.anualProj - META_MES*12; // vs meta=5.5M per store per year
+  // META_ANO/12 = 5.5M = meta anual por loja; L12 entrou em junho, só 7 meses em 2026
+  const META_LOJA_ANO = META_ANO / 12; // R$ 5.500.000 por loja
+  s.metaRef   = s.nova ? Math.round(META_LOJA_ANO * s.mesesAtivos / 12) : META_LOJA_ANO;
+  s.gapAnual  = s.anualProj - s.metaRef;
   s.yoy = s.anual2025 ? ((s.anualProj - s.anual2025)/s.anual2025*100) : null;
 });
 
@@ -576,10 +767,10 @@ const brlk = v=>{const a=Math.abs(v),s=v<0?'-':'+';return a>=1e6?s+'R$ '+(a/1e6)
 const medals=['🥇','🥈','🥉'];
 const tbody=document.getElementById('tbody');
 sorted.forEach((s,i)=>{
-  const pct=(s.anualProj/META_ANO*100);
+  const pct=(s.anualProj/s.metaRef*100);
   const clr=pct>=100?GREEN:pct>=85?YELLOW:RED;
   const tag=pct>=100?'tag-g':pct>=85?'tag-y':'tag-r';
-  const gap=s.anualProj-META_ANO;
+  const metaLabel = s.nova ? `R$ ${(s.metaRef/1e6).toFixed(2).replace('.',',')}M <span style="color:var(--gray);font-size:.63rem;">(${s.mesesAtivos} meses)</span>` : 'R$ 5,5M';
   tbody.innerHTML+=`
     <tr>
       <td style="font-weight:700;color:var(--gray);">${i<3?medals[i]:i+1+'º'}</td>
@@ -587,17 +778,17 @@ sorted.forEach((s,i)=>{
         <div style="display:flex;align-items:center;gap:8px;">
           <div class="spill" style="background:${clr}22;color:${clr};">L${s.cod}</div>
           <div>
-            <div style="font-weight:700;font-size:.8rem;">${s.nome}</div>
-            <div style="font-size:.67rem;color:var(--gray);">Drogaria</div>
+            <div style="font-weight:700;font-size:.8rem;">${s.nome}${s.nova?' <span style="background:rgba(168,85,247,.2);color:#C084FC;border:1px solid rgba(168,85,247,.4);border-radius:6px;font-size:.6rem;padding:1px 6px;font-weight:700;">NOVA Jun/26</span>':''}</div>
+            <div style="font-size:.67rem;color:var(--gray);">Drogaria${s.nova?' — entrou Jun/2026':''}</div>
           </div>
         </div>
       </td>
       <td style="font-weight:600;">${brlM(s.h1)}</td>
       <td style="color:#4ADE80;">${brlM(s.julProj)}</td>
       <td style="font-weight:700;font-size:.88rem;">${brlM(s.anualProj)}</td>
-      <td style="color:var(--yellow);">R$ 5,5M</td>
+      <td style="color:var(--yellow);">${metaLabel}</td>
       <td><span class="tag ${tag}">${pct.toFixed(1)}%</span></td>
-      <td style="color:${gap>=0?GREEN:RED};font-weight:700;">${brlk(gap)}</td>
+      <td style="color:${s.gapAnual>=0?GREEN:RED};font-weight:700;">${brlk(s.gapAnual)}</td>
       <td style="color:${s.yoy?((s.yoy>0)?'#4ADE80':'#FF8A80'):'var(--gray)'};">${s.yoy?'+'+s.yoy.toFixed(1)+'%':'—'}</td>
       <td style="color:var(--gray-l);">${brl(s.jul7)}</td>
     </tr>`;
@@ -693,10 +884,10 @@ new Chart(document.getElementById('chartJul7'),{
   data:{
     labels:jul7sorted.map(s=>'L'+s.cod),
     datasets:[
-      {label:'Jul 15 dias (01-15/Jul)',data:jul7sorted.map(s=>s.jul7),
+      {label:'Jul 7 dias',data:jul7sorted.map(s=>s.jul7),
         backgroundColor:jul7sorted.map(s=>s.julProj>=META_MES?'rgba(34,197,94,0.8)':'rgba(59,130,246,0.7)'),
         borderRadius:5,borderSkipped:false},
-      {label:'Meta/15 dias (R\$ 2,661k)',data:new Array(12).fill(Math.round(META_MES*15/31)),
+      {label:'Meta/15 dias (R$ 2,661k)',data:new Array(12).fill(Math.round(META_MES*15/31)),
         type:'line',borderColor:YELLOW,borderWidth:2,borderDash:[5,3],pointRadius:0,fill:false}
     ]
   },
@@ -707,6 +898,101 @@ new Chart(document.getElementById('chartJul7'),{
     scales:{
       x:{grid:{color:'#152060'},ticks:{color:'#7B8DB8',font:{size:10}}},
       y:{grid:{color:'#152060'},ticks:{color:'#7B8DB8',callback:v=>'R$ '+(v/1000).toFixed(0)+'k'}}
+    }
+  }
+});
+
+// ─── CENÁRIOS DE CRESCIMENTO ───
+const H2_BASE_VAL = d2026proj.reduce((a,b)=>a+b,0); // 35,033,470
+const H1_REAL = d2026real.reduce((a,b)=>a+b,0);     // 26,924,059
+const CENARIOS = [
+  {label:'Projeção Atual',sub:'Sazonalidade 2025',pct:0,   clr:'rgba(59,130,246,0.85)',border:'rgba(59,130,246,.5)'},
+  {label:'+5% no H2',     sub:'Crescimento moderado',pct:0.05, clr:'rgba(34,197,94,0.8)', border:'rgba(34,197,94,.4)'},
+  {label:'+10% no H2',    sub:'Crescimento forte',pct:0.10, clr:'rgba(234,179,8,0.85)',border:'rgba(234,179,8,.4)'},
+  {label:'+15,1% — Meta', sub:'Atingir R$ 66M ✅',pct:0.151,clr:'rgba(249,115,22,0.9)',border:'rgba(249,115,22,.6)'},
+  {label:'+20% no H2',    sub:'Potencial máximo',pct:0.20, clr:'rgba(168,85,247,0.85)',border:'rgba(168,85,247,.4)'},
+];
+
+const cenariosGrid=document.getElementById('cenariosGrid');
+const extraGrid=document.getElementById('extraGrid');
+const LOJAS_ATIVAS = 11; // 12 lojas mas L12 é nova, usar 12 para cálculo de esforço
+
+CENARIOS.forEach(c=>{
+  const total = H1_REAL + H2_BASE_VAL*(1+c.pct);
+  const pctMeta = (total/META_ANO*100);
+  const extraTotal = H2_BASE_VAL*c.pct;
+  const extraLojaMs = extraTotal / 6 / 12; // dividido por 6 meses e 12 lojas
+  const clrSolid = c.clr.replace(/0\.\d+\)/,'1)');
+  const isMeta = c.pct===0.136;
+  const pctClr = pctMeta>=100?'#4ADE80':pctMeta>=99?'#FB923C':pctMeta>=96?'#FDE047':'#94A3B8';
+  cenariosGrid.innerHTML+=`
+    <div style="background:rgba(0,0,0,.3);border:2px solid ${isMeta?c.border:'var(--navy4)'};border-radius:10px;padding:14px;text-align:center;${isMeta?'box-shadow:0 0 18px rgba(249,115,22,.2);':''}">
+      <div style="font-size:.65rem;color:var(--gray);text-transform:uppercase;letter-spacing:.06em;margin-bottom:7px;">${c.label}</div>
+      <div style="font-size:1.25rem;font-weight:800;color:${clrSolid};">${brlM(Math.round(total))}</div>
+      <div style="font-size:.75rem;font-weight:700;color:${pctClr};margin-top:5px;">${pctMeta.toFixed(1)}% da meta</div>
+      <div style="font-size:.65rem;color:var(--gray);margin-top:6px;padding-top:6px;border-top:1px solid var(--navy4);">${c.sub}</div>
+    </div>`;
+  extraGrid.innerHTML+=`
+    <div style="background:rgba(0,0,0,.2);border-radius:8px;padding:10px;text-align:center;border:1px solid ${c.border};">
+      <div style="font-size:.63rem;color:var(--gray);margin-bottom:4px;">${c.label}</div>
+      ${c.pct===0
+        ?`<div style="font-size:.9rem;font-weight:700;color:var(--gray-l);">Ritmo atual</div>`
+        :`<div style="font-size:.88rem;font-weight:800;color:${clrSolid};">+R$ ${Math.round(extraLojaMs).toLocaleString('pt-BR')}/mês</div><div style="font-size:.63rem;color:var(--gray);margin-top:3px;">por loja</div>`
+      }
+    </div>`;
+});
+
+// Chart: Total anual por cenário
+new Chart(document.getElementById('chartCenariosBar'),{
+  type:'bar',
+  data:{
+    labels:CENARIOS.map(c=>c.label),
+    datasets:[
+      {label:'Total Anual 2026',data:CENARIOS.map(c=>Math.round(H1_REAL+H2_BASE_VAL*(1+c.pct))),
+       backgroundColor:CENARIOS.map(c=>c.clr),borderRadius:6,borderWidth:0},
+      {label:'Meta R$ 66M',data:new Array(5).fill(META_ANO),
+       type:'line',borderColor:YELLOW,borderWidth:2,borderDash:[6,3],pointRadius:0,fill:false}
+    ]
+  },
+  options:{
+    responsive:true,maintainAspectRatio:false,
+    plugins:{legend:{position:'bottom',labels:{color:'#B0BEDD',padding:10,font:{size:10}}},
+      tooltip:{callbacks:{label:ctx=>ctx.dataset.label==='Total Anual 2026'?' '+brlM(ctx.raw)+' ('+((ctx.raw/META_ANO*100).toFixed(1))+'%)':' R$ 66M'}}},
+    scales:{
+      x:{grid:{color:'#152060'},ticks:{color:'#7B8DB8',font:{size:9},maxRotation:15}},
+      y:{grid:{color:'#152060'},ticks:{color:'#7B8DB8',callback:v=>'R$ '+(v/1e6).toFixed(0)+'M'},min:58000000}
+    }
+  }
+});
+
+// Chart: Curva mensal H2 por cenário
+new Chart(document.getElementById('chartCenariosLine'),{
+  type:'line',
+  data:{
+    labels:['Jul','Ago','Set','Out','Nov','Dez'],
+    datasets:[
+      ...CENARIOS.map(c=>({
+        label:c.label,
+        data:d2026proj.map(v=>Math.round(v*(1+c.pct))),
+        borderColor:c.clr.replace(/0\.\d+\)/,'1)'),
+        backgroundColor:'transparent',
+        borderWidth:c.pct===0?2.5:1.5,
+        borderDash:c.pct===0?[]:[4,2],
+        pointRadius:c.pct===0?3:2,
+        pointBackgroundColor:c.clr.replace(/0\.\d+\)/,'1)'),
+        fill:false,tension:.3
+      })),
+      {label:'Meta R$ 5,5M/mês',data:new Array(6).fill(META_MES),
+       borderColor:YELLOW,borderWidth:1,borderDash:[5,3],pointRadius:0,fill:false}
+    ]
+  },
+  options:{
+    responsive:true,maintainAspectRatio:false,
+    plugins:{legend:{position:'bottom',labels:{color:'#B0BEDD',padding:6,font:{size:9},boxWidth:16}},
+      tooltip:{callbacks:{label:ctx=>' '+brlM(ctx.raw)}}},
+    scales:{
+      x:{grid:{color:'#152060'},ticks:{color:'#7B8DB8'}},
+      y:{grid:{color:'#152060'},ticks:{color:'#7B8DB8',callback:v=>'R$ '+(v/1e6).toFixed(1)+'M'},min:4500000}
     }
   }
 });
