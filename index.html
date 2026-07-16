@@ -126,7 +126,7 @@ function flushLine(parts,path,ds){
 }
 
 window.Chart=function(el,cfg){if(el)draw(el,cfg);return{resize:function(){},update:function(){}};};
-window.Chart.defaults={responsive:true,maintainAspectRatio:false,color:'#B0BEDD',animation:false};
+window.Chart.defaults={responsive:true,maintainAspectRatio:false,color:'#B0BEDD',animation:false,font:{family:''},borderColor:'#152060'};
 window.Chart.instances={};
 window.Chart.register=function(){};
 window.Chart.helpers={each:function(){}};
