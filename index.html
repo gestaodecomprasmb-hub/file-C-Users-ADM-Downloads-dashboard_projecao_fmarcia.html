@@ -1,0 +1,797 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard Projeção — GMB Drogarias Mais Barato</title>
+<script>
+// SVG Chart Renderer — substitui Chart.js. Funciona em iOS/Safari/todos os browsers sem canvas.
+(function(){
+'use strict';
+var GR='#152060',AX='#7B8DB8',LG='#B0BEDD';
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function clrAt(c,i){return Array.isArray(c)?c[Math.min(i,c.length-1)]:(c||'#3B82F6');}
+
+function draw(el,cfg){
+  if(!el)return;
+  var D=cfg.data||{},O=cfg.options||{},SC=O.scales||{},PG=O.plugins||{};
+  var isH=O.indexAxis==='y',isLine=cfg.type==='line';
+  var labels=D.labels||[],DS=D.datasets||[],n=labels.length;
+  var barDS=isLine?[]:DS.filter(function(d){return !d.type||d.type==='bar';});
+  var lineDS=isLine?DS:DS.filter(function(d){return d.type==='line';});
+  var allV=[];
+  DS.forEach(function(d){(d.data||[]).forEach(function(v){if(v!=null&&isFinite(+v))allV.push(+v);});});
+  var parent=el.parentElement||el;
+  var W=600,rawH=parseInt(parent.style.height)||parseInt(parent.style.minHeight)||300;
+  var H=Math.max(rawH,100);
+  var PL=isH?112:56,PR=16,PT=12,PB=isH?28:50;
+  var cw=W-PL-PR,ch=H-PT-PB;
+  var parts=['<svg viewBox="0 0 '+W+' '+H+'" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%;display:block;">'];
+
+  if(isH){
+    var xMinO=(SC.x&&SC.x.min!=null)?+SC.x.min:0;
+    var allMinH=allV.length?Math.min.apply(null,allV):0;
+    var allMaxH=allV.length?Math.max.apply(null,allV):1;
+    var xMin=Math.min(xMinO,allMinH);
+    var xMax=allMaxH*1.12||1;
+    var xs=function(v){return PL+(v-xMin)/(xMax-xMin)*cw;};
+    var slot=ch/Math.max(n,1);
+    var bH=Math.min(20,slot*0.55);
+    for(var gi=0;gi<=4;gi++){
+      var gv=xMin+(xMax-xMin)*gi/4,gx=xs(gv);
+      parts.push('<line x1="'+gx.toFixed(1)+'" y1="'+PT+'" x2="'+gx.toFixed(1)+'" y2="'+(PT+ch)+'" stroke="'+GR+'" stroke-width="1"/>');
+      var gfmt=(SC.x&&SC.x.ticks&&SC.x.ticks.callback)?SC.x.ticks.callback(gv):gv.toFixed(0);
+      parts.push('<text x="'+gx.toFixed(1)+'" y="'+(PT+ch+13)+'" text-anchor="middle" fill="'+AX+'" font-size="10" font-family="sans-serif">'+esc(gfmt)+'</text>');
+    }
+    if(xMin<0&&xMax>0){
+      var x0=xs(0);
+      parts.push('<line x1="'+x0.toFixed(1)+'" y1="'+PT+'" x2="'+x0.toFixed(1)+'" y2="'+(PT+ch)+'" stroke="#FFD600" stroke-width="1.5"/>');
+    }
+    labels.forEach(function(lbl,i){
+      var yc=PT+slot*i+slot/2;
+      parts.push('<text x="'+(PL-5)+'" y="'+(yc+3.5).toFixed(1)+'" text-anchor="end" fill="'+AX+'" font-size="10" font-family="sans-serif">'+esc(lbl)+'</text>');
+      barDS.forEach(function(ds){
+        var v=(ds.data||[])[i];if(v==null||!isFinite(+v))return;
+        var x1=xs(Math.min(+v,0)),x2=xs(Math.max(+v,0));
+        var bw=Math.max(0,x2-x1);
+        parts.push('<rect x="'+x1.toFixed(1)+'" y="'+(yc-bH/2).toFixed(1)+'" width="'+bw.toFixed(1)+'" height="'+bH.toFixed(1)+'" rx="3" fill="'+clrAt(ds.backgroundColor,i)+'"/>');
+      });
+    });
+  } else {
+    var yMinO=(SC.y&&SC.y.min!=null)?+SC.y.min:0;
+    var allMaxV=allV.length?Math.max.apply(null,allV):1;
+    var yMin2=yMinO,yMax2=allMaxV*1.05;
+    if(yMax2<=yMin2)yMax2=yMin2+1;
+    var ys=function(v){return ch-((v-yMin2)/(yMax2-yMin2))*ch;};
+    for(var yi=0;yi<=4;yi++){
+      var yv=yMin2+(yMax2-yMin2)*yi/4,yy=PT+ys(yv);
+      parts.push('<line x1="'+PL+'" y1="'+yy.toFixed(1)+'" x2="'+(PL+cw)+'" y2="'+yy.toFixed(1)+'" stroke="'+GR+'" stroke-width="1"/>');
+      var yfmt=(SC.y&&SC.y.ticks&&SC.y.ticks.callback)?SC.y.ticks.callback(yv):yv.toFixed(0);
+      parts.push('<text x="'+(PL-5)+'" y="'+(yy+3.5).toFixed(1)+'" text-anchor="end" fill="'+AX+'" font-size="10" font-family="sans-serif">'+esc(yfmt)+'</text>');
+    }
+    labels.forEach(function(l,i){
+      var lx=PL+(i+0.5)*(cw/Math.max(n,1));
+      parts.push('<text x="'+lx.toFixed(1)+'" y="'+(PT+ch+15)+'" text-anchor="middle" fill="'+AX+'" font-size="10" font-family="sans-serif">'+esc(l)+'</text>');
+    });
+    var nb=barDS.length,gw=cw/Math.max(n,1);
+    var bwPer=Math.max(4,gw*0.72/Math.max(nb,1));
+    var bOff=(gw-bwPer*nb)/2;
+    barDS.forEach(function(ds,di){
+      (ds.data||[]).forEach(function(v,i){
+        if(v==null||!isFinite(+v))return;
+        var bx=PL+i*gw+bOff+di*bwPer;
+        var by=PT+ys(Math.max(+v,yMin2));
+        var bh=ys(yMin2)-ys(+v);
+        var r=ds.borderRadius!=null?ds.borderRadius:3;
+        parts.push('<rect x="'+bx.toFixed(1)+'" y="'+by.toFixed(1)+'" width="'+bwPer.toFixed(1)+'" height="'+Math.max(0,bh).toFixed(1)+'" rx="'+r+'" fill="'+clrAt(ds.backgroundColor,i)+'"/>');
+      });
+    });
+    lineDS.forEach(function(ds){
+      var path='',open=false;
+      (ds.data||[]).forEach(function(v,i){
+        if(v==null||!isFinite(+v)){if(open){flushLine(parts,path,ds);path='';open=false;}return;}
+        var lx=PL+(i+0.5)*(cw/Math.max(n,1)),ly=PT+ys(+v);
+        path+=(open?' L':' M')+lx.toFixed(1)+','+ly.toFixed(1);open=true;
+      });
+      if(path)flushLine(parts,path,ds);
+    });
+  }
+  var showLeg=!(PG.legend&&PG.legend.display===false);
+  if(showLeg){
+    var legDS=DS.filter(function(d){return d.label;});
+    if(legDS.length>0){
+      var lx3=PL,ly3=H-11;
+      legDS.slice(0,8).forEach(function(ds){
+        var c=ds.borderColor||(Array.isArray(ds.backgroundColor)?ds.backgroundColor[0]:(ds.backgroundColor||'#888'));
+        var isLn=(ds.type==='line'||isLine);
+        if(isLn){
+          var da=(ds.borderDash&&ds.borderDash.length)?'stroke-dasharray="'+ds.borderDash.join(',')+'"':'';
+          parts.push('<line x1="'+lx3+'" y1="'+(ly3-4)+'" x2="'+(lx3+12)+'" y2="'+(ly3-4)+'" stroke="'+c+'" stroke-width="2" '+da+'/>');
+        }else{
+          parts.push('<rect x="'+lx3+'" y="'+(ly3-8)+'" width="11" height="7" rx="2" fill="'+c+'"/>');
+        }
+        parts.push('<text x="'+(lx3+15)+'" y="'+ly3+'" fill="'+LG+'" font-size="9" font-family="sans-serif">'+esc(ds.label)+'</text>');
+        lx3+=Math.min(ds.label.length*5.4+20,120);
+        if(lx3>W-70){lx3=PL;ly3-=12;}
+      });
+    }
+  }
+  parts.push('</svg>');
+  el.innerHTML=parts.join('');
+}
+
+function flushLine(parts,path,ds){
+  var da=(ds.borderDash&&ds.borderDash.length)?'stroke-dasharray="'+ds.borderDash.join(',')+'"':'';
+  parts.push('<path d="'+path.trim()+'" fill="none" stroke="'+(ds.borderColor||'#FFD600')+'" stroke-width="'+(ds.borderWidth||2)+'" '+da+'/>');
+}
+
+window.Chart=function(el,cfg){if(el)draw(el,cfg);return{resize:function(){},update:function(){}};};
+window.Chart.defaults={responsive:true,maintainAspectRatio:false,color:'#B0BEDD',animation:false};
+window.Chart.instances={};
+window.Chart.register=function(){};
+window.Chart.helpers={each:function(){}};
+})();
+</script>
+<style>
+:root{
+  --navy:#060B28; --navy2:#0C1445; --navy3:#152060; --navy4:#1E2D7D;
+  --red:#CC1A14; --red-l:#E53935; --yellow:#FFD600; --yellow-l:#FFE44D;
+  --white:#FFF; --gray:#7B8DB8; --gray-l:#B0BEDD; --green:#22C55E;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--navy);color:var(--white);min-height:100vh;}
+
+/* HEADER */
+.header{background:linear-gradient(135deg,var(--navy2),var(--navy3));border-bottom:3px solid var(--red);padding:0 32px;display:flex;align-items:stretch;justify-content:space-between;}
+.header-logo{display:flex;align-items:center;padding:18px 0;}
+.logo-gmb{font-size:2.2rem;font-weight:900;color:var(--white);letter-spacing:-1px;font-style:italic;}
+.logo-sep{width:3px;background:var(--red);margin:0 18px;border-radius:2px;align-self:stretch;}
+.logo-right{display:flex;flex-direction:column;justify-content:center;gap:2px;}
+.logo-drogarias{font-size:0.85rem;font-weight:900;color:var(--red-l);letter-spacing:.12em;text-transform:uppercase;}
+.logo-mais{font-size:1.2rem;font-weight:900;color:var(--yellow);font-style:italic;}
+.logo-barato{font-size:1.5rem;font-weight:900;color:var(--white);font-style:italic;letter-spacing:-1px;}
+.logo-r{font-size:.6rem;color:var(--gray);vertical-align:super;}
+.header-right{display:flex;flex-direction:column;justify-content:center;align-items:flex-end;gap:8px;padding:18px 0;}
+.header-title{font-size:.75rem;color:var(--gray-l);text-transform:uppercase;letter-spacing:.1em;}
+.hbadges{display:flex;gap:8px;}
+.hb{padding:5px 14px;border-radius:20px;font-size:.75rem;font-weight:700;border:1px solid;}
+.hb-red{background:rgba(204,26,20,.2);color:#FF8A80;border-color:var(--red);}
+.hb-yellow{background:rgba(255,214,0,.15);color:var(--yellow);border-color:rgba(255,214,0,.4);}
+.hb-blue{background:rgba(30,45,125,.5);color:var(--gray-l);border-color:var(--navy4);}
+.hb-green{background:rgba(34,197,94,.2);color:#4ADE80;border-color:#22C55E;}
+
+/* ALERT STRIP */
+.alert{background:linear-gradient(90deg,#065f46,#166534);border-top:2px solid var(--green);border-bottom:2px solid var(--green);padding:10px 32px;display:flex;align-items:center;justify-content:center;gap:16px;font-size:.85rem;font-weight:700;color:#4ADE80;}
+.alert .pill{background:rgba(34,197,94,.2);border:1px solid var(--green);border-radius:20px;padding:4px 12px;font-size:.78rem;}
+
+/* INFO STRIP */
+.strip{background:var(--red);padding:6px 32px;display:flex;justify-content:space-between;align-items:center;font-size:.72rem;font-weight:700;color:var(--white);}
+
+/* CONTAINER */
+.container{padding:22px 32px;max-width:1400px;margin:0 auto;}
+
+/* KPI */
+.kpi-row{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin-bottom:20px;}
+.kpi{background:var(--navy2);border:1px solid var(--navy3);border-radius:12px;padding:16px 18px;display:flex;flex-direction:column;gap:5px;position:relative;overflow:hidden;}
+.kpi::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;}
+.kpi.k-red::before{background:var(--red);}
+.kpi.k-yellow::before{background:var(--yellow);}
+.kpi.k-blue::before{background:#3B82F6;}
+.kpi.k-green::before{background:var(--green);}
+.kpi.k-gray::before{background:var(--navy4);}
+.kpi.k-orange::before{background:#F97316;}
+.k-label{font-size:.65rem;text-transform:uppercase;letter-spacing:.08em;color:var(--gray);}
+.k-val{font-size:1.3rem;font-weight:800;line-height:1.1;}
+.k-sub{font-size:.68rem;color:var(--gray);}
+.k-blue .k-val{color:#60A5FA;} .k-red .k-val{color:#FF8A80;} .k-yellow .k-val{color:var(--yellow);}
+.k-green .k-val{color:#4ADE80;} .k-gray .k-val{color:#A78BFA;} .k-orange .k-val{color:#FB923C;}
+
+/* CARDS */
+.card{background:var(--navy2);border:1px solid var(--navy3);border-radius:12px;padding:18px 22px;margin-bottom:18px;}
+.card-title{font-size:.72rem;text-transform:uppercase;letter-spacing:.1em;color:var(--gray);margin-bottom:14px;display:flex;align-items:center;gap:8px;}
+.card-title::before{content:'';width:3px;height:14px;background:var(--red);border-radius:2px;flex-shrink:0;}
+.card-title.ytitle::before{background:var(--yellow);}
+.card-title.gtitle::before{background:var(--green);}
+
+/* PROGRESS BAR */
+.pbar-wrap{background:var(--navy3);border-radius:8px;height:28px;overflow:hidden;}
+.pbar-fill{height:100%;border-radius:8px;display:flex;align-items:center;padding-left:14px;font-size:.8rem;font-weight:700;}
+.pbar-labels{display:flex;justify-content:space-between;margin-top:7px;font-size:.71rem;color:var(--gray);}
+
+/* CHARTS */
+.charts-2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:18px;}
+.charts-3{display:grid;grid-template-columns:2fr 1fr;gap:16px;margin-bottom:18px;}
+.chart-card{background:var(--navy2);border:1px solid var(--navy3);border-radius:12px;padding:18px 22px;}
+.chart-card h3{font-size:.71rem;text-transform:uppercase;letter-spacing:.1em;color:var(--gray);margin-bottom:14px;display:flex;align-items:center;gap:8px;}
+.chart-card h3::before{content:'';width:3px;height:14px;background:var(--yellow);border-radius:2px;flex-shrink:0;}
+
+/* JULY REAL-TIME */
+.jul-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:18px;}
+.jul-card{background:rgba(0,0,0,.25);border-radius:10px;padding:14px;text-align:center;border:1px solid var(--navy4);}
+.jul-card .jl{font-size:.68rem;color:var(--gray);margin-bottom:5px;text-transform:uppercase;letter-spacing:.06em;}
+.jul-card .jv{font-size:1.05rem;font-weight:800;}
+.jul-card .js{font-size:.7rem;color:var(--gray);margin-top:3px;}
+
+/* TABLE */
+.table-card{background:var(--navy2);border:1px solid var(--navy3);border-radius:12px;overflow:hidden;margin-bottom:18px;}
+.table-header{padding:14px 22px;border-bottom:1px solid var(--navy3);background:var(--navy3);display:flex;justify-content:space-between;align-items:center;}
+.table-header h2{font-size:.88rem;font-weight:700;}
+.table-header span{font-size:.73rem;color:var(--gray);}
+table{width:100%;border-collapse:collapse;}
+thead th{background:rgba(0,0,0,.3);padding:9px 14px;text-align:left;font-size:.65rem;color:var(--gray);text-transform:uppercase;letter-spacing:.07em;}
+tbody tr{border-top:1px solid var(--navy3);transition:background .15s;}
+tbody tr:hover{background:rgba(30,45,125,.3);}
+tbody td{padding:11px 14px;font-size:.81rem;vertical-align:middle;}
+tbody tr.total-row{background:var(--navy3);border-top:2px solid var(--navy4);}
+tbody tr.total-row td{font-weight:700;}
+.spill{display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:7px;font-weight:800;font-size:.76rem;}
+.mbar{background:var(--navy3);border-radius:4px;height:6px;width:90px;overflow:hidden;display:inline-block;}
+.mbar-fill{height:100%;border-radius:4px;}
+.tag{display:inline-block;padding:2px 8px;border-radius:9px;font-size:.69rem;font-weight:700;}
+.tag-g{background:rgba(34,197,94,.15);color:#4ADE80;}
+.tag-y{background:rgba(255,214,0,.15);color:var(--yellow);}
+.tag-r{background:rgba(204,26,20,.2);color:#FF8A80;}
+
+/* META 2027 */
+.meta27{background:linear-gradient(135deg,var(--navy2),var(--navy3));border:1px solid var(--yellow);border-radius:12px;padding:22px;margin-bottom:18px;}
+.meta27-title{font-size:.95rem;font-weight:800;color:var(--yellow);margin-bottom:16px;display:flex;align-items:center;gap:10px;}
+.meta27-title::before{content:'';width:4px;height:20px;background:var(--red);border-radius:2px;}
+.m27g{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:18px;}
+.m27c{background:rgba(0,0,0,.25);border-radius:9px;padding:14px;text-align:center;border:1px solid var(--navy4);}
+.m27c .ml{font-size:.68rem;color:var(--gray);margin-bottom:5px;text-transform:uppercase;}
+.m27c .mv{font-size:1rem;font-weight:800;}
+.m27c .ms{font-size:.7rem;margin-top:4px;}
+
+/* PLANO */
+.plano{background:linear-gradient(135deg,#0A0E25,#0D1540);border:2px solid var(--red);border-radius:12px;padding:22px;margin-bottom:18px;}
+.plano-title{font-size:.95rem;font-weight:800;color:#FF8A80;margin-bottom:6px;display:flex;align-items:center;gap:10px;}
+.plano-title::before{content:'';width:4px;height:20px;background:var(--red);border-radius:2px;}
+.plano-sub{font-size:.76rem;color:var(--gray);margin-bottom:18px;padding-left:14px;}
+.mes-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin-bottom:18px;}
+.mes-card{background:rgba(0,0,0,.3);border-radius:9px;padding:12px 10px;border:1px solid var(--navy4);text-align:center;}
+.mes-card.ok{border-color:rgba(34,197,94,.4);}
+.mes-card.warn{border-color:rgba(255,214,0,.3);}
+.mc-mes{font-size:.67rem;color:var(--gray);text-transform:uppercase;letter-spacing:.07em;margin-bottom:5px;}
+.mc-val{font-size:.95rem;font-weight:800;margin-bottom:3px;}
+.mc-dia{font-size:.67rem;color:var(--yellow);margin-top:4px;font-weight:700;}
+.mc-pct{font-size:.67rem;margin-top:3px;font-weight:700;}
+
+
+/* MOBILE */
+@media (max-width:960px){
+  .kpi-row{grid-template-columns:repeat(3,1fr);}
+  .charts-2,.charts-3{grid-template-columns:1fr;}
+  .jul-grid{grid-template-columns:repeat(2,1fr);}
+  .m27g{grid-template-columns:repeat(2,1fr);}
+  .container{padding:14px 16px;}
+}
+@media (max-width:600px){
+  .kpi-row{grid-template-columns:repeat(2,1fr);}
+  .header{flex-direction:column;padding:12px 16px;}
+  .mes-grid{grid-template-columns:repeat(3,1fr);}
+}.footer{background:var(--navy2);border-top:1px solid var(--navy3);text-align:center;padding:14px;color:var(--gray);font-size:.7rem;}
+.footer strong{color:var(--red-l);}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-logo">
+    <div class="logo-gmb">GMB</div>
+    <div class="logo-sep"></div>
+    <div class="logo-right">
+      <div class="logo-drogarias">Drogarias</div>
+      <div style="display:flex;align-items:baseline;gap:4px;">
+        <span class="logo-mais">Mais</span>
+        <span class="logo-barato">Barato</span>
+        <span class="logo-r">®</span>
+      </div>
+    </div>
+  </div>
+  <div class="header-right">
+    <div class="header-title">Dashboard de Projeção — 12 Lojas Rede Fmarcia</div>
+    <div class="hbadges">
+      <div class="hb hb-blue">12 Lojas Ativas</div>
+      <div class="hb hb-yellow">Dados até 15/Jul/2026</div>
+      <div class="hb hb-red">Meta Anual R$ 66M</div>
+    </div>
+  </div>
+</div>
+
+<!-- ALERT -->
+<div class="alert">
+  <span>✅ 15 DIAS CONFIRMADOS — R$ 5.555.490/mês</span>
+  <span class="pill">Ritmo: R$ 179.209/dia | Acumulado: R$ 2.688.140</span>
+  <span>+R$ 55.490 acima da meta | 15 dias confirmados</span>
+</div>
+
+<!-- STRIP -->
+<div class="strip">
+  <span>GRUPO GMB — DROGARIAS MAIS BARATO®</span>
+  <span>META MENSAL: R$ 5.500.000 &nbsp;|&nbsp; META ANUAL 2026: R$ 66.000.000</span>
+  <span>H1 REALIZADO: R$ 26.924.059 &nbsp;|&nbsp; PROJEÇÃO 2026: R$ 60.868.544</span>
+</div>
+
+<div class="container">
+
+<!-- KPIs -->
+<div class="kpi-row">
+  <div class="kpi k-blue">
+    <div class="k-label">H1 2026 (Jan–Jun)</div>
+    <div class="k-val">R$ 26,9M</div>
+    <div class="k-sub">R$ 26.924.059 realizado</div>
+  </div>
+  <div class="kpi k-green">
+    <div class="k-label">Julho (15 dias)</div>
+    <div class="k-val">R$ 5,56M</div>
+    <div class="k-sub">+R$ 55.490 acima da meta ✅</div>
+  </div>
+  <div class="kpi k-orange">
+    <div class="k-label">Projeção 2026</div>
+    <div class="k-val">R$ 60,87M</div>
+    <div class="k-sub">92,2% da meta anual de 66M</div>
+  </div>
+  <div class="kpi k-red">
+    <div class="k-label">Gap para R$ 66M</div>
+    <div class="k-val">-R$ 5,13M</div>
+    <div class="k-sub">Necessário +R$ 855k/mês no H2</div>
+  </div>
+  <div class="kpi k-yellow">
+    <div class="k-label">Crescimento YoY</div>
+    <div class="k-val">+18,9%</div>
+    <div class="k-sub">vs 2025 (média por loja)</div>
+  </div>
+  <div class="kpi k-gray">
+    <div class="k-label">Meta Anual 2026</div>
+    <div class="k-val">R$ 66M</div>
+    <div class="k-sub">5,5M × 12 meses</div>
+  </div>
+</div>
+
+<!-- PROGRESSO ANUAL -->
+<div class="card">
+  <div class="card-title gtitle">Progresso Anual 2026 → Meta R$ 66M (H1 realizado + H2 projetado)</div>
+  <div class="pbar-wrap">
+    <div class="pbar-fill" style="width:92.2%;background:linear-gradient(90deg,#1d4ed8,#E53935,#F97316);color:#fff;">
+      92,2% — Projeção: R$ 60.868.544
+    </div>
+  </div>
+  <div class="pbar-labels">
+    <span>H1 real: R$ 26,9M (40,8%)</span>
+    <span style="color:var(--yellow);font-weight:700;">🎯 Meta: R$ 66.000.000</span>
+    <span style="color:#FF8A80;">Gap: -R$ 5.131.456</span>
+  </div>
+</div>
+
+<!-- CHARTS ROW 1: Mensal 2026 vs 2025 vs meta -->
+<div class="chart-card" style="margin-bottom:18px;">
+  <h3>Desempenho Mensal 2026 (Jan–Jun Real + Jul–Dez Projetado) vs 2025 e Meta</h3>
+  <div style="position:relative;height:300px;"><div style="display:block;width:100%;height:100%;" id="chartMensal"></div></div>
+</div>
+
+<!-- CHARTS ROW 2: Acumulado + YoY -->
+<div class="charts-2">
+  <div class="chart-card">
+    <h3>Acumulado Anual 2026 → Meta R$ 66M</h3>
+    <div style="position:relative;height:260px;"><div style="display:block;width:100%;height:100%;" id="chartAcum"></div></div>
+  </div>
+  <div class="chart-card">
+    <h3>Crescimento YoY por Loja (2026 proj vs 2025)</h3>
+    <div style="position:relative;height:260px;"><div style="display:block;width:100%;height:100%;" id="chartYoY"></div></div>
+  </div>
+</div>
+
+<!-- JULHO EM TEMPO REAL -->
+<div class="card">
+  <div class="card-title gtitle">🟢 Julho 2026 — Tempo Real (Dias 1–15 realizados)</div>
+  <div class="jul-grid">
+    <div class="jul-card">
+      <div class="jl">15 Dias Realizados</div>
+      <div class="jv" style="color:#4ADE80;">R$ 2.688.140</div>
+      <div class="js">01 a 15/Jul/2026</div>
+    </div>
+    <div class="jul-card">
+      <div class="jl">Ritmo Diário</div>
+      <div class="jv" style="color:#60A5FA;">R$ 179.209/dia</div>
+      <div class="js">meta diária: R$ 177.419/dia</div>
+    </div>
+    <div class="jul-card">
+      <div class="jl">Projeção Julho (×31 dias)</div>
+      <div class="jv" style="color:#4ADE80;">R$ 5.555.490</div>
+      <div class="js">+R$ 55.490 acima da meta ✅</div>
+    </div>
+    <div class="jul-card">
+      <div class="jl">% da Meta (5,5M)</div>
+      <div class="jv" style="color:#4ADE80;">101,0%</div>
+      <div class="js">Meta atingida! ✅</div>
+    </div>
+  </div>
+  <div style="position:relative;height:200px;"><div style="display:block;width:100%;height:100%;" id="chartJul7"></div></div>
+</div>
+
+<!-- TABELA LOJAS -->
+<div class="table-card">
+  <div class="table-header">
+    <h2>Projeção Anual por Loja — 2026</h2>
+    <span>Meta anual/loja: <strong style="color:var(--yellow);">R$ 5.500.000</strong></span>
+  </div>
+  <table>
+    <thead>
+      <tr>
+        <th>Rank</th><th>Loja</th><th>H1 Real</th><th>Jul Proj.</th>
+        <th>Anual Proj.</th><th>Meta Anual</th><th>% Meta</th><th>Gap Anual</th>
+        <th>Cresc. YoY</th><th>Jul 7 dias</th>
+      </tr>
+    </thead>
+    <tbody id="tbody"></tbody>
+  </table>
+</div>
+
+<!-- PLANO PARA 66M -->
+<div class="plano">
+  <div class="plano-title">⚡ PLANO PARA ATINGIR R$ 66M EM 2026</div>
+  <div class="plano-sub">No ritmo atual projetamos R$ 60,87M. Para fechar os R$ 66M, o H2 precisa rodar a R$ 6.513k/mês em média — ou seja, +R$ 855k/mês acima da projeção atual (+17,2% vs Julho)</div>
+
+  <div style="display:grid;grid-template-columns:1.5fr 1fr;gap:16px;margin-bottom:18px;">
+    <div>
+      <div style="font-size:.71rem;text-transform:uppercase;letter-spacing:.08em;color:var(--gray);margin-bottom:12px;display:flex;align-items:center;gap:6px;"><span style="width:3px;height:12px;background:var(--red);border-radius:2px;display:inline-block;"></span>H2 necessário vs projetado</div>
+      <div style="position:relative;height:220px;"><div style="display:block;width:100%;height:100%;" id="chartPlano"></div></div>
+    </div>
+    <div>
+      <div style="font-size:.71rem;text-transform:uppercase;letter-spacing:.08em;color:var(--gray);margin-bottom:12px;display:flex;align-items:center;gap:6px;"><span style="width:3px;height:12px;background:var(--yellow);border-radius:2px;display:inline-block;"></span>Contribuição por loja para fechar o gap</div>
+      <div style="position:relative;height:220px;"><div style="display:block;width:100%;height:100%;" id="chartGap"></div></div>
+    </div>
+  </div>
+
+  <div style="font-size:.71rem;text-transform:uppercase;letter-spacing:.08em;color:var(--gray);margin-bottom:10px;display:flex;align-items:center;gap:6px;"><span style="width:3px;height:12px;background:var(--yellow);border-radius:2px;display:inline-block;"></span>Metas mensais H2 para atingir R$ 66M</div>
+  <div class="mes-grid" id="mesGrid"></div>
+
+  <div class="m27g">
+    <div class="m27c">
+      <div class="ml">Gap Total para 66M</div>
+      <div class="mv" style="color:#FF8A80;">-R$ 5.131.456</div>
+      <div class="ms" style="color:var(--gray);">vs projeção atual</div>
+    </div>
+    <div class="m27c">
+      <div class="ml">Extra Necessário/Mês H2</div>
+      <div class="mv" style="color:var(--yellow);">+R$ 855.243</div>
+      <div class="ms" style="color:var(--gray);">por mês em média</div>
+    </div>
+    <div class="m27c">
+      <div class="ml">Meta Mensal para 66M</div>
+      <div class="mv" style="color:#4ADE80;">R$ 6.512.657</div>
+      <div class="ms" style="color:var(--gray);">+R$ 957k vs projeção Jul</div>
+    </div>
+    <div class="m27c">
+      <div class="ml">Crescimento Necessário vs Jul</div>
+      <div class="mv" style="color:var(--yellow);">+17,2%</div>
+      <div class="ms" style="color:var(--gray);">acima da projeção de Julho</div>
+    </div>
+  </div>
+</div>
+
+<!-- META 2027 -->
+<div class="meta27">
+  <div class="meta27-title">🎯 META ANUAL 2027 — R$ 66 Milhões (se não atingida em 2026)</div>
+  <div class="m27g">
+    <div class="m27c">
+      <div class="ml">Meta Mensal Necessária</div>
+      <div class="mv" style="color:#4ADE80;">R$ 5.500.000</div>
+      <div class="ms" style="color:var(--gray);">= meta atual — manter ritmo Jul</div>
+    </div>
+    <div class="m27c">
+      <div class="ml">Meta por Loja / Mês</div>
+      <div class="mv" style="color:#60A5FA;">R$ 458.333</div>
+      <div class="ms" style="color:var(--gray);">12 lojas, 12 meses</div>
+    </div>
+    <div class="m27c">
+      <div class="ml">Projeção 2027 no ritmo Jul</div>
+      <div class="mv" style="color:#4ADE80;">R$ 68,8M</div>
+      <div class="ms" style="color:#4ADE80;">Acima da meta!</div>
+    </div>
+    <div class="m27c">
+      <div class="ml">Crescimento vs 2025</div>
+      <div class="mv" style="color:var(--yellow);">+40%</div>
+      <div class="ms" style="color:var(--gray);">vs R$ 49,2M em 2025</div>
+    </div>
+  </div>
+  <div>
+    <div style="font-size:.71rem;color:var(--gray);margin-bottom:7px;text-transform:uppercase;letter-spacing:.08em;">Trajetória: 2025 real → 2026 proj → 2027 meta</div>
+    <div class="pbar-wrap">
+      <div class="pbar-fill" style="width:94%;background:linear-gradient(90deg,var(--red),var(--red-l));color:#fff;">
+        2026: R$ 60,87M (92,2% de 66M)
+      </div>
+    </div>
+    <div class="pbar-labels">
+      <span>2025 real: R$ 49,2M</span>
+      <span style="color:var(--yellow);font-weight:700;">🎯 2026 meta: R$ 66M</span>
+      <span style="color:#FF8A80;">Gap: -R$ 5,13M</span>
+    </div>
+  </div>
+</div>
+
+</div>
+<div class="footer">Dashboard atualizado em 16/07/2026 &nbsp;|&nbsp; <strong>GMB — Drogarias Mais Barato®</strong> &nbsp;|&nbsp; Dados: Jan–Jun 2026 real + Jul 1–15 2026 + 2025 histórico</div>
+
+<script>
+// ─── DADOS ───
+const MESES = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+const META_MES = 5500000;
+const META_ANO = 66000000;
+
+// 2025 monthly totals (all available stores)
+const d2025 = [3474384,3294176,3601245,3860541,4412535,4238306,4308056,4288004,4189178,4474168,4333147,4729150];
+// 2026 H1 monthly totals (11 stores Jan-May + 12 stores Jun)
+const d2026real = [4075790,3963083,4540151,4498940,4811731,5034365];
+// 2026 H2 projected (Jul-Dec, based on Jul 7-day actual + 2025 seasonality)
+const d2026proj = [5555490,5529601,5402227,5769740,5587823,6099605];
+const d2026all = [...d2026real, ...d2026proj];
+
+// Cumulative 2026
+const acum2026 = d2026all.map((_,i)=>d2026all.slice(0,i+1).reduce((a,b)=>a+b,0));
+const acumMeta = MESES.map((_,i)=>(i+1)*META_MES);
+const acum2025 = d2025.map((_,i)=>d2025.slice(0,i+1).reduce((a,b)=>a+b,0));
+
+const RED='#E53935', YELLOW='#FFD600', BLUE='#3B82F6', GREEN='#22C55E', GRAY='#334155';
+
+Chart.defaults.color='#7B8DB8';
+Chart.defaults.borderColor='#152060';
+Chart.defaults.font.family="'Segoe UI',system-ui,sans-serif";
+
+// Store data
+const stores = [
+  {cod:'01',nome:'Dez. de Março',    h1:2797587,jul7:259832,anual2025:5045215},
+  {cod:'02',nome:'Bohadana',         h1:2525330,jul7:235587,anual2025:4491329},
+  {cod:'03',nome:'Parque Anchieta',  h1:3360088,jul7:319065,anual2025:6645303},
+  {cod:'04',nome:'Top 10',           h1:2893730,jul7:274671,anual2025:5578725},
+  {cod:'05',nome:'Vicente Carvalho', h1:2763321,jul7:264234,anual2025:5303371},
+  {cod:'06',nome:'Top 20',           h1:2554113,jul7:259991,anual2025:4675471},
+  {cod:'07',nome:'Atrativa Olinda',  h1:1694733,jul7:169053, anual2025:3407492},
+  {cod:'08',nome:'Farmagreg',        h1:2082848,jul7:195130, anual2025:3972260},
+  {cod:'09',nome:'Ponto Certo',      h1:2154104,jul7:191488, anual2025:3962311},
+  {cod:'10',nome:'FJW3',             h1:2097457,jul7:175873, anual2025:3732342},
+  {cod:'11',nome:'Rainha MH',        h1:1612755,jul7:131388, anual2025:2389073},
+  {cod:'12',nome:'Nobre Releango',   h1:387923, jul7:211827,anual2025:null, nova:true, mesesAtivos:7},
+];
+
+const totalJul7 = stores.reduce((a,s)=>a+s.jul7,0); // 1295275.50
+const H2_TOTAL = d2026proj.reduce((a,b)=>a+b,0); // 35033470
+
+stores.forEach(s=>{
+  s.julProj = Math.round(s.jul7 * 31 / 15);
+  s.h2proj  = Math.round((s.julProj / (totalJul7*31/15)) * H2_TOTAL);
+  s.anualProj = s.h1 + s.h2proj;
+  s.gapAnual  = s.anualProj - META_MES*12; // vs meta=5.5M per store per year
+  s.yoy = s.anual2025 ? ((s.anualProj - s.anual2025)/s.anual2025*100) : null;
+});
+
+const sorted = [...stores].sort((a,b)=>b.anualProj-a.anualProj);
+
+const brl  = v=>'R$ '+v.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+const brlM = v=>'R$ '+(v/1e6).toFixed(2).replace('.',',')+'M';
+const brlk = v=>{const a=Math.abs(v),s=v<0?'-':'+';return a>=1e6?s+'R$ '+(a/1e6).toFixed(2).replace('.',',')+'M':s+'R$ '+Math.round(a/1000)+'k';};
+
+// ─── TABELA ───
+const medals=['🥇','🥈','🥉'];
+const tbody=document.getElementById('tbody');
+sorted.forEach((s,i)=>{
+  const pct=(s.anualProj/META_ANO*100);
+  const clr=pct>=100?GREEN:pct>=85?YELLOW:RED;
+  const tag=pct>=100?'tag-g':pct>=85?'tag-y':'tag-r';
+  const gap=s.anualProj-META_ANO;
+  tbody.innerHTML+=`
+    <tr>
+      <td style="font-weight:700;color:var(--gray);">${i<3?medals[i]:i+1+'º'}</td>
+      <td>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <div class="spill" style="background:${clr}22;color:${clr};">L${s.cod}</div>
+          <div>
+            <div style="font-weight:700;font-size:.8rem;">${s.nome}</div>
+            <div style="font-size:.67rem;color:var(--gray);">Drogaria</div>
+          </div>
+        </div>
+      </td>
+      <td style="font-weight:600;">${brlM(s.h1)}</td>
+      <td style="color:#4ADE80;">${brlM(s.julProj)}</td>
+      <td style="font-weight:700;font-size:.88rem;">${brlM(s.anualProj)}</td>
+      <td style="color:var(--yellow);">R$ 5,5M</td>
+      <td><span class="tag ${tag}">${pct.toFixed(1)}%</span></td>
+      <td style="color:${gap>=0?GREEN:RED};font-weight:700;">${brlk(gap)}</td>
+      <td style="color:${s.yoy?((s.yoy>0)?'#4ADE80':'#FF8A80'):'var(--gray)'};">${s.yoy?'+'+s.yoy.toFixed(1)+'%':'—'}</td>
+      <td style="color:var(--gray-l);">${brl(s.jul7)}</td>
+    </tr>`;
+});
+const totH1=stores.reduce((a,s)=>a+s.h1,0);
+const totAP=stores.reduce((a,s)=>a+s.anualProj,0);
+tbody.innerHTML+=`
+  <tr class="total-row">
+    <td colspan="2">TOTAL REDE (12 Lojas)</td>
+    <td style="color:#60A5FA;">${brlM(totH1)}</td>
+    <td style="color:#4ADE80;">${brlM(stores.reduce((a,s)=>a+s.julProj,0))}</td>
+    <td style="color:#F97316;">${brlM(totAP)}</td>
+    <td style="color:var(--yellow);">R$ 66M</td>
+    <td><span class="tag tag-y">${(totAP/META_ANO*100).toFixed(1)}%</span></td>
+    <td style="color:#FF8A80;">${brlk(totAP-META_ANO)}</td>
+    <td style="color:#4ADE80;">+26%</td>
+    <td style="color:var(--gray-l);">${brl(totalJul7)}</td>
+  </tr>`;
+
+// ─── CHART 1: MENSAL 2026 vs 2025 vs Meta ───
+new Chart(document.getElementById('chartMensal'),{
+  type:'bar',
+  data:{
+    labels:MESES,
+    datasets:[
+      {label:'2025 Real',data:d2025,backgroundColor:'rgba(100,116,139,0.35)',borderColor:'rgba(100,116,139,0.6)',borderWidth:1,borderRadius:4,order:3},
+      {label:'2026 Real (Jan–Jun)',data:[...d2026real,...new Array(6).fill(null)],backgroundColor:'rgba(59,130,246,0.8)',borderRadius:5,order:2},
+      {label:'2026 Projetado (Jul–Dez)',data:[...new Array(6).fill(null),...d2026proj],backgroundColor:d2026proj.map(v=>v>=META_MES?'rgba(34,197,94,0.75)':'rgba(249,115,22,0.75)'),borderRadius:5,order:2},
+      {label:'Meta R$ 5,5M',data:new Array(12).fill(META_MES),type:'line',borderColor:YELLOW,borderWidth:2,borderDash:[6,3],pointRadius:0,fill:false,order:1},
+    ]
+  },
+  options:{
+    responsive:true,maintainAspectRatio:false,
+    plugins:{legend:{position:'bottom',labels:{color:'#B0BEDD',padding:14,font:{size:11}}},
+      tooltip:{callbacks:{label:ctx=>' '+brlM(ctx.raw)}}},
+    scales:{
+      x:{grid:{color:'#152060'},ticks:{color:'#7B8DB8'}},
+      y:{grid:{color:'#152060'},ticks:{color:'#7B8DB8',callback:v=>'R$ '+(v/1e6).toFixed(1)+'M'},min:2500000}
+    }
+  }
+});
+
+// ─── CHART 2: ACUMULADO ───
+new Chart(document.getElementById('chartAcum'),{
+  type:'line',
+  data:{
+    labels:MESES,
+    datasets:[
+      {label:'Meta R$ 66M',data:acumMeta,borderColor:YELLOW,borderWidth:2,borderDash:[6,3],pointRadius:2,fill:false},
+      {label:'2026 Real (Jan–Jun)',data:[...acum2026.slice(0,6),...new Array(6).fill(null)],borderColor:BLUE,backgroundColor:'rgba(59,130,246,0.1)',borderWidth:2,pointRadius:3,fill:true},
+      {label:'2026 Projetado (Jul–Dez)',data:[...new Array(5).fill(null),acum2026[5],...acum2026.slice(6)],borderColor:GREEN,backgroundColor:'rgba(34,197,94,0.07)',borderWidth:2,borderDash:[4,2],pointRadius:3,fill:true},
+      {label:'2025 Real',data:acum2025,borderColor:GRAY,borderWidth:1,borderDash:[3,3],pointRadius:1,fill:false},
+    ]
+  },
+  options:{
+    responsive:true,maintainAspectRatio:false,
+    plugins:{legend:{position:'bottom',labels:{color:'#B0BEDD',padding:10,font:{size:10}}},
+      tooltip:{callbacks:{label:ctx=>ctx.raw?' '+brlM(ctx.raw):''}}},
+    scales:{
+      x:{grid:{color:'#152060'},ticks:{color:'#7B8DB8'}},
+      y:{grid:{color:'#152060'},ticks:{color:'#7B8DB8',callback:v=>'R$ '+(v/1e6).toFixed(0)+'M'}}
+    }
+  }
+});
+
+// ─── CHART 3: YoY POR LOJA ───
+const yoyData=stores.filter(s=>s.yoy!==null).sort((a,b)=>b.yoy-a.yoy);
+new Chart(document.getElementById('chartYoY'),{
+  type:'bar',
+  data:{
+    labels:yoyData.map(s=>'L'+s.cod+' '+s.nome.split(' ')[0]),
+    datasets:[{
+      label:'Crescimento YoY %',
+      data:yoyData.map(s=>+s.yoy.toFixed(1)),
+      backgroundColor:yoyData.map(s=>s.yoy>=20?'rgba(34,197,94,0.8)':s.yoy>=10?'rgba(255,214,0,0.75)':'rgba(249,115,22,0.7)'),
+      borderRadius:4
+    }]
+  },
+  options:{
+    indexAxis:'y',responsive:true,maintainAspectRatio:false,
+    plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>' +'+ctx.raw+'% vs 2025'}}},
+    scales:{
+      x:{grid:{color:'#152060'},ticks:{color:'#7B8DB8',callback:v=>'+'+v+'%'},min:0},
+      y:{grid:{color:'#152060'},ticks:{color:'#7B8DB8',font:{size:10}}}
+    }
+  }
+});
+
+// ─── CHART 4: JULHO 7 DIAS POR LOJA ───
+const jul7sorted=[...stores].sort((a,b)=>b.jul7-a.jul7);
+new Chart(document.getElementById('chartJul7'),{
+  type:'bar',
+  data:{
+    labels:jul7sorted.map(s=>'L'+s.cod),
+    datasets:[
+      {label:'Jul 15 dias (01-15/Jul)',data:jul7sorted.map(s=>s.jul7),
+        backgroundColor:jul7sorted.map(s=>s.julProj>=META_MES?'rgba(34,197,94,0.8)':'rgba(59,130,246,0.7)'),
+        borderRadius:5,borderSkipped:false},
+      {label:'Meta/15 dias (R\$ 2,661k)',data:new Array(12).fill(Math.round(META_MES*15/31)),
+        type:'line',borderColor:YELLOW,borderWidth:2,borderDash:[5,3],pointRadius:0,fill:false}
+    ]
+  },
+  options:{
+    responsive:true,maintainAspectRatio:false,
+    plugins:{legend:{labels:{color:'#B0BEDD',font:{size:10}}},
+      tooltip:{callbacks:{label:ctx=>' '+brl(ctx.raw)}}},
+    scales:{
+      x:{grid:{color:'#152060'},ticks:{color:'#7B8DB8',font:{size:10}}},
+      y:{grid:{color:'#152060'},ticks:{color:'#7B8DB8',callback:v=>'R$ '+(v/1000).toFixed(0)+'k'}}
+    }
+  }
+});
+
+// ─── CHART 5: PLANO H2 (necessário vs projetado) ───
+const mesesH2=['Jul','Ago','Set','Out','Nov','Dez'];
+const proj66 = [6512657,6512657,6512657,6512657,6512657,6512657]; // uniform for simplicity
+new Chart(document.getElementById('chartPlano'),{
+  type:'bar',
+  data:{
+    labels:mesesH2,
+    datasets:[
+      {label:'Projeção atual',data:d2026proj,backgroundColor:'rgba(59,130,246,0.65)',borderRadius:5},
+      {label:'Necessário p/ 66M',data:proj66,backgroundColor:'rgba(229,57,53,0.3)',borderRadius:5},
+      {label:'Meta 5,5M',data:new Array(6).fill(META_MES),type:'line',borderColor:YELLOW,borderWidth:2,borderDash:[5,3],pointRadius:0,fill:false}
+    ]
+  },
+  options:{
+    responsive:true,maintainAspectRatio:false,
+    plugins:{legend:{position:'bottom',labels:{color:'#B0BEDD',padding:8,font:{size:10}}},
+      tooltip:{callbacks:{label:ctx=>' '+brlM(ctx.raw)}}},
+    scales:{
+      x:{grid:{color:'#152060'},ticks:{color:'#7B8DB8',font:{size:10}}},
+      y:{grid:{color:'#152060'},ticks:{color:'#7B8DB8',callback:v=>'R$ '+(v/1e6).toFixed(1)+'M'},min:4000000}
+    }
+  }
+});
+
+// ─── CHART 6: GAP POR LOJA ───
+const gapLojas=[...stores].sort((a,b)=>b.gapAnual-a.gapAnual);
+new Chart(document.getElementById('chartGap'),{
+  type:'bar',
+  data:{
+    labels:gapLojas.map(s=>'L'+s.cod),
+    datasets:[{
+      label:'Gap vs meta anual (R$ 5,5M)',
+      data:gapLojas.map(s=>Math.round(s.gapAnual/1000)),
+      backgroundColor:gapLojas.map(s=>s.gapAnual>=0?'rgba(34,197,94,0.75)':'rgba(229,57,53,0.65)'),
+      borderRadius:4
+    }]
+  },
+  options:{
+    indexAxis:'y',responsive:true,maintainAspectRatio:false,
+    plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>' R$ '+ctx.raw+'k'}}},
+    scales:{
+      x:{grid:{color:'#152060'},ticks:{color:'#7B8DB8',callback:v=>v+'k'}},
+      y:{grid:{color:'#152060'},ticks:{color:'#7B8DB8',font:{size:10}}}
+    }
+  },
+  plugins:[{id:'zero',afterDraw(c){
+    const{ctx,chartArea,scales}=c;
+    const x=scales.x.getPixelForValue(0);
+    ctx.save();ctx.beginPath();
+    ctx.moveTo(x,chartArea.top);ctx.lineTo(x,chartArea.bottom);
+    ctx.strokeStyle=YELLOW;ctx.lineWidth=1.5;ctx.stroke();ctx.restore();
+  }}]
+});
+
+// ─── MES GRID: Plano para 66M ───
+const mesGrid=document.getElementById('mesGrid');
+// Para atingir 66M: H2 precisa de 39,075,941 total
+// H1 real = 26,924,059 → precisa H2 = 39,075,941
+// Jul está em 5,733,906 → Ago-Dez precisam de 33,342,035 / 5 = 6,668,407/mês
+const H2_NEED = META_ANO - d2026real.reduce((a,b)=>a+b,0); // 66M - H1
+const diasMes = [31,31,30,31,30,31];
+const nomeMes = ['Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+// Distribute 66M target for H2 using seasonality
+const sazMult = [1, 0.99535, 0.97241, 1.03854, 1.00582, 1.09779];
+const sazSum  = sazMult.reduce((a,b)=>a+b,0);
+nomeMes.forEach((m,i)=>{
+  const mNeed = Math.round(H2_NEED * (sazMult[i]/sazSum));
+  const mProj = d2026proj[i];
+  const extra = mNeed - mProj;
+  const pctMeta = (mProj/META_MES*100).toFixed(1);
+  const ok = mProj >= META_MES;
+  const diaRate = Math.round(mNeed/diasMes[i]);
+  mesGrid.innerHTML+=`
+    <div class="mes-card ${ok?'ok':'warn'}">
+      <div class="mc-mes">${m}</div>
+      <div class="mc-val" style="color:${ok?'#4ADE80':YELLOW};">${brlM(mNeed)}</div>
+      <div style="font-size:.67rem;color:var(--gray);margin-top:2px;">Proj: ${brlM(mProj)}</div>
+      <div class="mc-dia">R$ ${diaRate.toLocaleString('pt-BR')}/dia</div>
+      <div class="mc-pct" style="color:${extra<=0?'#4ADE80':'#FF8A80'};">${extra>0?'+':''}R$ ${Math.round(extra/1000)}k vs proj</div>
+    </div>`;
+});
+</script>
+</body>
+</html>
