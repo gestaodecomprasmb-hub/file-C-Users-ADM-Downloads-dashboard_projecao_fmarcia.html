@@ -360,10 +360,10 @@ tbody tr.total-row td{font-weight:700;}
     <div class="k-val">R$ 5,56M</div>
     <div class="k-sub">Projeção do mês ✅ acima meta</div>
   </div>
-  <div class="kpi k-green" style="border:1px solid rgba(34,197,94,.4);">
+  <div class="kpi k-green" id="kpiMinDiario" style="border:1px solid rgba(34,197,94,.4);">
     <div class="k-label">Mínimo diário p/ meta Jul</div>
-    <div class="k-val">R$ 175.741</div>
-    <div class="k-sub" style="color:#4ADE80;">Ritmo atual: R$ 179.209 ✅ +R$ 3.468/dia</div>
+    <div class="k-val" id="kpiMinDiarioVal">R$ 175.741</div>
+    <div class="k-sub" id="kpiMinDiarioSub" style="color:#4ADE80;">Ritmo atual: R$ 179.209 ✅ +R$ 3.468/dia</div>
   </div>
   <div class="kpi k-orange">
     <div class="k-label">Projeção 2026</div>
@@ -745,6 +745,21 @@ const stores = [
 
 const totalJul7 = stores.reduce((a,s)=>a+s.jul7,0); // 1295275.50
 const H2_TOTAL = d2026proj.reduce((a,b)=>a+b,0); // 35033470
+
+// ─── KPI: Mínimo diário necessário p/ bater a meta de Julho ───
+const DIAS_REALIZADOS_JUL = 15;
+const DIAS_MES_JUL = 31;
+const diasRestantesJul = DIAS_MES_JUL - DIAS_REALIZADOS_JUL;
+const faltaMetaJul = META_MES - totalJul7;
+const minDiarioJul = Math.max(0, Math.round(faltaMetaJul / diasRestantesJul));
+const ritmoAtualJul = Math.round(totalJul7 / DIAS_REALIZADOS_JUL);
+const folgaDiariaJul = ritmoAtualJul - minDiarioJul;
+const bateMetaJul = folgaDiariaJul >= 0;
+document.getElementById('kpiMinDiarioVal').textContent = 'R$ '+minDiarioJul.toLocaleString('pt-BR');
+document.getElementById('kpiMinDiarioSub').innerHTML = 'Ritmo atual: R$ '+ritmoAtualJul.toLocaleString('pt-BR')+' '+(bateMetaJul?'✅':'⚠️')+' '+(folgaDiariaJul>=0?'+':'-')+'R$ '+Math.abs(folgaDiariaJul).toLocaleString('pt-BR')+'/dia';
+document.getElementById('kpiMinDiario').className = 'kpi '+(bateMetaJul?'k-green':'k-red');
+document.getElementById('kpiMinDiario').style.border = '1px solid '+(bateMetaJul?'rgba(34,197,94,.4)':'rgba(204,26,20,.4)');
+document.getElementById('kpiMinDiarioSub').style.color = bateMetaJul?'#4ADE80':'#FF8A80';
 
 stores.forEach(s=>{
   s.julProj = Math.round(s.jul7 * 31 / 15);
